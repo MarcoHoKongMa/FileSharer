@@ -5,13 +5,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.SplitPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
+import java.io.File;
 
 public class Main extends Application {
 
@@ -20,11 +22,23 @@ public class Main extends Application {
 
         VBox root = new VBox();
 
-        // Create the Menubar and add the menu buttons
-        MenuBar menuBar = new MenuBar();
-        Menu download = new Menu("Download");
-        Menu upload = new Menu("Upload");
-        menuBar.getMenus().addAll(download, upload);
+        // Create buttons
+        HBox hBox = new HBox();
+
+        Button button1 = new Button("Download");
+        Button button2 = new Button("upload");
+
+//        button1.setOnAction(e -> {
+//
+//        });
+//
+        button2.setOnAction(e -> {
+        File directory = new File("src\\Assign2\\Client\\TextFiles");
+
+
+        });
+
+        hBox.getChildren().addAll(button1, button2);
 
         // Create the split plane layout
         SplitPane splitPane = new SplitPane();
@@ -36,7 +50,7 @@ public class Main extends Application {
         rightPanel.getChildren().add(rightListView);
         splitPane.getItems().addAll(leftPanel, rightPanel);
 
-        root.getChildren().addAll(menuBar, splitPane);
+        root.getChildren().addAll(hBox, splitPane);
 
         primaryStage.setTitle("File Sharer v1.0");
         primaryStage.setScene(new Scene(root, 300, 275));

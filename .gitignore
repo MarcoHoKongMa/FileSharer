@@ -1,4 +1,5 @@
 out
 .idea
-
 *.iml
+src/Assign2/Client/TextFiles
+src/Assign2/Server/TextFiles
