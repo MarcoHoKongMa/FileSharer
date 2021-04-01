@@ -3,6 +3,7 @@ package Assign2.Client;
 import java.net.*;
 import java.io.*;
 import javafx.application.Application;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -13,6 +14,9 @@ import java.util.List;
 
 public class Client extends Application {
 
+    private PrintWriter clientOutput;
+    private BufferedReader clientInput;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         // Command line arguments
@@ -20,7 +24,10 @@ public class Client extends Application {
         List<String> args = parameters.getRaw();
 
         try{
-            Socket socket = new Socket(args.get(0), 1024);
+            Socket socket = new Socket("127.0.0.1", 1024);                            // Connect to the server
+            clientOutput = new PrintWriter(socket.getOutputStream(), true);            // Output stream
+            clientInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));  // Input Stream
+
         }catch (IOException e) {
             e.printStackTrace();
         }
@@ -43,8 +50,8 @@ public class Client extends Application {
         VBox leftPanel = new VBox();
         VBox rightPanel = new VBox();
 
-        ListView leftListView = new ListView();
-        ListView rightListView = new ListView();
+        ListView<String> leftListView = new ListView();
+        ListView<String> rightListView = new ListView();
         leftListView.setPrefHeight(windowHeight);
         rightListView.setPrefHeight(windowHeight);
 
@@ -62,13 +69,15 @@ public class Client extends Application {
             }
         }
 
-        // Buttons Event
+        // Download button event
         button1.setOnAction(e -> {
-            leftListView.getItems().remove("hello");
+
         });
 
+        // Upload button event
         button2.setOnAction(e -> {
-            leftListView.getItems().add("hello");
+            ObservableList<Integer> selectedFileName = leftListView.getSelectionModel().getSelectedIndices();
+            clientOutput.println(filesList[selectedFileName.get(0)].getName());
         });
 
         root.getChildren().addAll(hBox, splitPane);
