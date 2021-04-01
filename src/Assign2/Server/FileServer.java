@@ -4,24 +4,31 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 
-public class FileServer {
-    private static int serverPort = 1024;
-    private static int maxClients = 25;
-    private int numClients = 0;
+/**
+ * FileServer class used to represent the server of a file sharing system
+ * @author  Ting Wu, Marco Ma
+ * @version 1.0
+ * @since   2021-03-28
+ */
 
+public class FileServer {
+    // Class Parameters
+    private static int serverPort = 1024;   // default port number being used
+    private static int maxClients = 25;     // maximum number of threads
+    private int numClients = 0;             // counter
     private FileServerThread[] threads;
     private ServerSocket serverSocket;
     private Socket clientSocket;
 
-    private ArrayList<File> files = new ArrayList<>();
-
+    // Constructor
     public FileServer() {
         try {
-            serverSocket = new ServerSocket(serverPort);        // Server Socket
-            threads = new FileServerThread[maxClients];         // Threads
-            while(true) {
-                clientSocket = serverSocket.accept();           // Clients Socket (which port the client is using)
-                threads[numClients] = new FileServerThread(clientSocket);
+            serverSocket = new ServerSocket(serverPort);                                            // Create a server socket
+            threads = new FileServerThread[maxClients];                                             // Create an array of threads
+            while(true) {                                                                           // Wait for client to connect to server
+                clientSocket = serverSocket.accept();                                               // Clients Socket (which port the client is using)
+                threads[numClients] = new FileServerThread(clientSocket);   // Create a new thread
+                threads[numClients].start();
                 numClients++;
             }
         }catch(IOException e) {
@@ -29,6 +36,7 @@ public class FileServer {
         }
     }
 
+    // Main method to execute the server class
     public static void main(String[] args) {
         FileServer fileServer = new FileServer();
     }
