@@ -1,7 +1,5 @@
 package Assign2.Client;
 
-import java.net.*;
-import java.io.*;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
@@ -9,8 +7,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import java.io.File;
-import java.util.List;
+
+import java.net.*;
+import java.io.*;
+import java.util.*;
 
 public class Client extends Application {
 
@@ -71,13 +71,24 @@ public class Client extends Application {
 
         // Download button event
         button1.setOnAction(e -> {
-
+            ObservableList<Integer> selectedFileName = rightListView.getSelectionModel().getSelectedIndices();
+            try {
+                clientOutput.println(filesList[selectedFileName.get(0)].getName());
+            }catch (IndexOutOfBoundsException i) {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "No file chosen");
+                alert.showAndWait();
+            }
         });
 
         // Upload button event
         button2.setOnAction(e -> {
             ObservableList<Integer> selectedFileName = leftListView.getSelectionModel().getSelectedIndices();
-            clientOutput.println(filesList[selectedFileName.get(0)].getName());
+            try {
+                clientOutput.println(filesList[selectedFileName.get(0)].getName());
+            }catch (IndexOutOfBoundsException i) {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "No file chosen");
+                alert.showAndWait();
+            }
         });
 
         root.getChildren().addAll(hBox, splitPane);
