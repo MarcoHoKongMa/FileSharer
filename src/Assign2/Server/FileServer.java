@@ -2,7 +2,6 @@ package Assign2.Server;
 
 import java.net.*;
 import java.io.*;
-import java.util.*;
 
 /**
  * FileServer class used to represent the server of a file sharing system
@@ -23,15 +22,15 @@ public class FileServer {
     // Constructor
     public FileServer() {
         try {
-            serverSocket = new ServerSocket(serverPort);                                            // Create a server socket
-            threads = new FileServerThread[maxClients];                                             // Create an array of threads
-            while(true) {                                                                           // Wait for client to connect to server
-                clientSocket = serverSocket.accept();                                               // Clients Socket (which port the client is using)
-                threads[numClients] = new FileServerThread(clientSocket);   // Create a new thread
+            serverSocket = new ServerSocket(serverPort);                        // Create a server socket
+            threads = new FileServerThread[maxClients];                         // Create an array of threads
+            while(true) {                                                       // Wait for client to connect to server
+                clientSocket = serverSocket.accept();                           // Clients Socket (which port the client is using)
+                threads[numClients] = new FileServerThread(clientSocket);       // Create a new thread
                 threads[numClients].start();
                 numClients++;
             }
-        }catch(IOException e) {
+        } catch(IOException e) {
             e.printStackTrace();
         }
     }

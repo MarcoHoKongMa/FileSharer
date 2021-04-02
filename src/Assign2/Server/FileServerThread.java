@@ -2,7 +2,6 @@ package Assign2.Server;
 
 import java.net.*;
 import java.io.*;
-import java.util.*;
 
 /**
  * FileServerThread used to represent a thread for a server that process requests
@@ -16,6 +15,7 @@ public class FileServerThread extends Thread {
     private Socket socket;
     private BufferedReader serverInput;
     private PrintWriter serverOutput;
+    private File directory = new File("src\\Assign2\\Server\\TextFiles");
 
     // Constructor
     public FileServerThread(Socket socket) throws IOException {
@@ -27,48 +27,68 @@ public class FileServerThread extends Thread {
     /**
      * The run method executes a thread and performs some task.
      */
-    public void run(){
-        // DIR
-        String[] fileNames = DIR();
-        for (String fileName : fileNames) {
-            serverOutput.println(fileName);
-        }
+    public void run() {
+        while(true) {
+            // DIR, Upload, or Download
+            try {
+                String command = serverInput.readLine();
+                System.out.println(command);
 
-        // Upload or Download
-        try {
-            if (serverInput.readLine().equals("UPLOAD")) {
-                uploadFile();
-            }
-            else if (serverInput.readLine().equals("DOWNLOAD")){
-                downloadFile();
-            }
-        }catch(IOException e){
-            e.printStackTrace();
-        }finally{   // Update the files the server has
-            fileNames = DIR();
-            for (String fileName : fileNames) {
-                serverOutput.println(fileName);
+                if(command.equals("DIR")) {              // DIR - List Contents
+                    String[] fileNames = dir();
+                    serverOutput.println(fileNames.length);
+                    for (String fileName: fileNames) {
+                        serverOutput.println(fileName);
+                    }
+                }
+                else if(command.equals("UPLOAD")) {      // UPLOAD
+                    uploadFile();
+                }
+                else {                                                  // DOWNLOAD
+                    downloadFile();
+                }
+            } catch(IOException e) {
+                e.printStackTrace();
             }
         }
     }
 
-    public String[] DIR(){
-        File directory = new File("\\src\\Assign2\\Server\\TextFiles");
+    public String[] dir() {
         File[] filesList = directory.listFiles();
-        System.out.println(filesList[0].getName());
-        String[] fileNames = new String[filesList.length];
+        String[] fileNames = new String[1];
 
-        for (int i=0; i< fileNames.length; i++){
-            fileNames[i] = filesList[i].getName();
+        if(filesList != null) {
+            fileNames = new String[filesList.length];
+            for (int i = 0; i < fileNames.length; i++) {
+                fileNames[i] = filesList[i].getName();
+            }
         }
+
         return fileNames;
     }
 
-    public void uploadFile(){
+    public void uploadFile() throws IOException {
+        File srcFile = new File(directory.getPath() + "\\" + serverInput.readLine());
+        PrintWriter writer = new PrintWriter(srcFile);
+        String endOfFile = "false";
 
+        while(!(endOfFile.equals("true"))) {
+            writer.println(serverInput.readLine());
+            endOfFile = serverInput.readLine();
+        }
     }
 
-    public void downloadFile(){
+    public void downloadFile() throws IOException {
+        File srcFile = new File(directory.getPath() + "\\" + serverInput.readLine());
+        FileReader fileInput = new FileReader(srcFile);
+        BufferedReader bufferedReader = new BufferedReader(fileInput);
 
+        String line;
+        while((line = bufferedReader.readLine()) != null) {
+            serverOutput.println(line);
+            serverOutput.println("false");
+        }
+        serverOutput.println();
+        serverOutput.println("true");
     }
 }

@@ -10,13 +10,17 @@ import javafx.stage.Stage;
 
 import java.net.*;
 import java.io.*;
-import java.nio.Buffer;
 import java.util.*;
 
 public class Client extends Application {
 
     private PrintWriter clientOutput;
     private BufferedReader clientInput;
+    private Socket socket = null;
+
+    // Lists
+    ListView<String> leftListView = new ListView();
+    ListView<String> rightListView = new ListView();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -24,12 +28,12 @@ public class Client extends Application {
         Parameters parameters = getParameters();
         List<String> args = parameters.getRaw();
 
-        try{
-            Socket socket = new Socket("127.0.0.1", 1024);                            // Connect to the server
+        try {
+            socket = new Socket("127.0.0.1", 1024);                            // Connect to the server
             clientOutput = new PrintWriter(socket.getOutputStream(), true);            // Output stream
-            clientInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));  // Input Stream
+            clientInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));   // Input Stream
 
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -51,8 +55,6 @@ public class Client extends Application {
         VBox leftPanel = new VBox();
         VBox rightPanel = new VBox();
 
-        ListView<String> leftListView = new ListView();
-        ListView<String> rightListView = new ListView();
         leftListView.setPrefHeight(windowHeight);
         rightListView.setPrefHeight(windowHeight);
 
@@ -71,18 +73,31 @@ public class Client extends Application {
         }
 
         // Right Panel - Files in the Server
-        rightListView = refreshRightPanel(rightListView);
+        refreshRightPanel();
 
         // Download button event
         button1.setOnAction(e -> {
-//            ObservableList<Integer> selectedFileName = rightListView.getSelectionModel().getSelectedIndices();
-//            try {
-//                clientOutput.println("DOWNLOAD");
-//                clientOutput.println(filesList[selectedFileName.get(0)].getName());
-//            }catch (IndexOutOfBoundsException i) {
-//                Alert alert = new Alert(Alert.AlertType.WARNING, "No file chosen");
-//                alert.showAndWait();
-//            }
+            ObservableList<Integer> selectedFileName = rightListView.getSelectionModel().getSelectedIndices();
+            try {
+                clientOutput.println("DOWNLOAD");
+                clientOutput.println(filesList[selectedFileName.get(0)].getName());
+
+                File srcFile = new File(directory.getPath() + "\\" + filesList[selectedFileName.get(0)].getName());
+                PrintWriter writer = new PrintWriter(srcFile);
+                String endOfFile = "false";
+
+                while(!(endOfFile.equals("true"))) {
+                    writer.println(clientInput.readLine());
+                    endOfFile = clientInput.readLine();
+                }
+
+                leftListView.getItems().add(srcFile.getName());
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            } catch (IndexOutOfBoundsException exception) {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "No file chosen to download");
+                alert.showAndWait();
+            }
         });
 
         // Upload button event
@@ -92,16 +107,23 @@ public class Client extends Application {
                 clientOutput.println("UPLOAD");
                 clientOutput.println(filesList[selectedFileName.get(0)].getName());
                 try {
-                    BufferedReader bufferedReader = new BufferedReader(new FileReader(filesList[selectedFileName.get(0)].getName()));
+                    FileReader fileInput = new FileReader(directory.getPath()
+                            + "\\" + (filesList[selectedFileName.get(0)].getName()));
+                    BufferedReader bufferedReader = new BufferedReader(fileInput);
                     String line;
-                    while((line = bufferedReader.readLine()) != null){
+                    while((line = bufferedReader.readLine()) != null) {
                         clientOutput.println(line);
+                        clientOutput.println("false");
                     }
-                }catch(IOException exception){
+                    clientOutput.println();
+                    clientOutput.println("true");
+
+                    refreshRightPanel();
+                }catch(IOException exception) {
                     exception.printStackTrace();
                 }
-            }catch (IndexOutOfBoundsException i) {
-                Alert alert = new Alert(Alert.AlertType.WARNING, "No file chosen");
+            }catch (IndexOutOfBoundsException exception) {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "No file chosen to upload");
                 alert.showAndWait();
             }
         });
@@ -113,18 +135,22 @@ public class Client extends Application {
         primaryStage.show();
     }
 
+    public void refreshRightPanel() throws IOException {
+        clientOutput.println("DIR");
+
+        int index = 0;
+        int length = Integer.parseInt(clientInput.readLine());
+        String line;
+
+        rightListView.getItems().clear();
+        while(index < length) {
+            rightListView.getItems().add(clientInput.readLine());
+            index++;
+        }
+    }
+
 
     public static void main(String[] args) {
         launch(args);
-    }
-
-    public ListView<String> refreshRightPanel(ListView<String> rightListView) throws IOException {
-        int index = 0;
-        String line;
-        rightListView.getItems().clear();
-        while((line = clientInput.readLine()) != null) {
-            rightListView.getItems().add(clientInput.readLine());
-        }
-        return rightListView;
     }
 }
