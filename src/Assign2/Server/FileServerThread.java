@@ -32,7 +32,6 @@ public class FileServerThread extends Thread {
             // DIR, Upload, or Download
             try {
                 String command = serverInput.readLine();
-                System.out.println(command);
 
                 if(command.equals("DIR")) {              // DIR - List Contents
                     String[] fileNames = dir();
@@ -49,6 +48,8 @@ public class FileServerThread extends Thread {
                 }
             } catch(IOException e) {
                 e.printStackTrace();
+            } catch(NullPointerException e) {
+                break;
             }
         }
     }
@@ -73,7 +74,7 @@ public class FileServerThread extends Thread {
         String endOfFile = "false";
 
         while(!(endOfFile.equals("true"))) {
-            writer.println(serverInput.readLine());
+            System.out.println(serverInput.readLine());
             endOfFile = serverInput.readLine();
         }
     }

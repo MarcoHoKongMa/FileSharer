@@ -17,6 +17,9 @@ public class Client extends Application {
     private PrintWriter clientOutput;
     private BufferedReader clientInput;
     private Socket socket = null;
+    private File directory = null;
+    private File[] filesList = null;
+    private ArrayList<String> serverFiles = null;
 
     // Lists
     ListView<String> leftListView = new ListView();
@@ -63,14 +66,8 @@ public class Client extends Application {
         splitPane.getItems().addAll(leftPanel, rightPanel);
 
         // Left Panel - Files in Local Client
-        File directory = new File(args.get(1));
-        File[] filesList = directory.listFiles();
-
-        if(filesList != null) {
-            for(File file: filesList) {
-                leftListView.getItems().add(file.getName());
-            }
-        }
+        directory = new File(args.get(1));
+        refreshLeftPanel();
 
         // Right Panel - Files in the Server
         refreshRightPanel();
@@ -80,9 +77,10 @@ public class Client extends Application {
             ObservableList<Integer> selectedFileName = rightListView.getSelectionModel().getSelectedIndices();
             try {
                 clientOutput.println("DOWNLOAD");
-                clientOutput.println(filesList[selectedFileName.get(0)].getName());
+                clientOutput.println(serverFiles.get(selectedFileName.get(0)));
 
-                File srcFile = new File(directory.getPath() + "\\" + filesList[selectedFileName.get(0)].getName());
+                File srcFile = new File(directory.getPath() + "\\" + serverFiles.get(selectedFileName.get(0)));
+                srcFile = new File(srcFile.getAbsolutePath());
                 PrintWriter writer = new PrintWriter(srcFile);
                 String endOfFile = "false";
 
@@ -91,7 +89,7 @@ public class Client extends Application {
                     endOfFile = clientInput.readLine();
                 }
 
-                leftListView.getItems().add(srcFile.getName());
+                refreshLeftPanel();
             } catch (IOException exception) {
                 exception.printStackTrace();
             } catch (IndexOutOfBoundsException exception) {
@@ -135,16 +133,35 @@ public class Client extends Application {
         primaryStage.show();
     }
 
+    @Override
+    public void stop() throws IOException {
+        socket.close();
+    }
+
+    private void refreshLeftPanel() {
+        leftListView.getItems().clear();
+        filesList = directory.listFiles();
+
+        if(filesList != null) {
+            for(File file: filesList) {
+                leftListView.getItems().add(file.getName());
+            }
+        }
+    }
+
     public void refreshRightPanel() throws IOException {
         clientOutput.println("DIR");
 
         int index = 0;
         int length = Integer.parseInt(clientInput.readLine());
-        String line;
+        serverFiles = new ArrayList<>();
+        String fileNames = null;
 
         rightListView.getItems().clear();
         while(index < length) {
-            rightListView.getItems().add(clientInput.readLine());
+            fileNames = clientInput.readLine();
+            rightListView.getItems().add(fileNames);
+            serverFiles.add(fileNames);
             index++;
         }
     }
