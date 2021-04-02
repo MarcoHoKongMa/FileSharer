@@ -43,7 +43,7 @@ public class FileServerThread extends Thread {
                 else if(command.equals("UPLOAD")) {      // UPLOAD
                     uploadFile();
                 }
-                else {                                                  // DOWNLOAD
+                else if(command.equals("DOWNLOAD")){      // DOWNLOAD
                     downloadFile();
                 }
             } catch(IOException e) {
@@ -74,9 +74,10 @@ public class FileServerThread extends Thread {
         String endOfFile = "false";
 
         while(!(endOfFile.equals("true"))) {
-            System.out.println(serverInput.readLine());
+            writer.write(serverInput.readLine()+"\n");
             endOfFile = serverInput.readLine();
         }
+        writer.close();
     }
 
     public void downloadFile() throws IOException {
@@ -91,5 +92,6 @@ public class FileServerThread extends Thread {
         }
         serverOutput.println();
         serverOutput.println("true");
+        bufferedReader.close();
     }
 }

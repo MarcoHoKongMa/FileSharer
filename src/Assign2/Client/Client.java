@@ -31,14 +31,8 @@ public class Client extends Application {
         Parameters parameters = getParameters();
         List<String> args = parameters.getRaw();
 
-        try {
-            socket = new Socket("127.0.0.1", 1024);                            // Connect to the server
-            clientOutput = new PrintWriter(socket.getOutputStream(), true);            // Output stream
-            clientInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));   // Input Stream
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // Connect to the server
+        reconnect();
 
         double windowWidth = 550.0;
         double windowHeight = 500.0;
@@ -74,6 +68,7 @@ public class Client extends Application {
 
         // Download button event
         button1.setOnAction(e -> {
+            reconnect();
             ObservableList<Integer> selectedFileName = rightListView.getSelectionModel().getSelectedIndices();
             try {
                 clientOutput.println("DOWNLOAD");
@@ -90,6 +85,10 @@ public class Client extends Application {
                 }
 
                 refreshLeftPanel();
+                socket.close();
+                clientInput.close();
+                clientOutput.close();
+                writer.close();
             } catch (IOException exception) {
                 exception.printStackTrace();
             } catch (IndexOutOfBoundsException exception) {
@@ -100,6 +99,7 @@ public class Client extends Application {
 
         // Upload button event
         button2.setOnAction(e -> {
+            reconnect();
             ObservableList<Integer> selectedFileName = leftListView.getSelectionModel().getSelectedIndices();
             try {
                 clientOutput.println("UPLOAD");
@@ -109,6 +109,8 @@ public class Client extends Application {
                             + "\\" + (filesList[selectedFileName.get(0)].getName()));
                     BufferedReader bufferedReader = new BufferedReader(fileInput);
                     String line;
+
+                    // Pass contents of the file
                     while((line = bufferedReader.readLine()) != null) {
                         clientOutput.println(line);
                         clientOutput.println("false");
@@ -117,6 +119,10 @@ public class Client extends Application {
                     clientOutput.println("true");
 
                     refreshRightPanel();
+                    socket.close();
+                    clientOutput.close();
+                    clientInput.close();
+
                 }catch(IOException exception) {
                     exception.printStackTrace();
                 }
@@ -163,6 +169,20 @@ public class Client extends Application {
             rightListView.getItems().add(fileNames);
             serverFiles.add(fileNames);
             index++;
+        }
+        socket.close();
+        clientInput.close();
+        clientOutput.close();
+    }
+
+    public void reconnect(){
+        try {
+            socket = new Socket("127.0.0.1", 1024);                            // Connect to the server
+            clientOutput = new PrintWriter(socket.getOutputStream(), true);            // Output stream
+            clientInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));   // Input Stream
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
