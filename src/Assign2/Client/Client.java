@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 
 import java.net.*;
 import java.io.*;
+import java.nio.Buffer;
 import java.util.*;
 
 public class Client extends Application {
@@ -69,22 +70,36 @@ public class Client extends Application {
             }
         }
 
+        // Right Panel - Files in the Server
+        rightListView = refreshRightPanel(rightListView);
+
         // Download button event
         button1.setOnAction(e -> {
-            ObservableList<Integer> selectedFileName = rightListView.getSelectionModel().getSelectedIndices();
-            try {
-                clientOutput.println(filesList[selectedFileName.get(0)].getName());
-            }catch (IndexOutOfBoundsException i) {
-                Alert alert = new Alert(Alert.AlertType.WARNING, "No file chosen");
-                alert.showAndWait();
-            }
+//            ObservableList<Integer> selectedFileName = rightListView.getSelectionModel().getSelectedIndices();
+//            try {
+//                clientOutput.println("DOWNLOAD");
+//                clientOutput.println(filesList[selectedFileName.get(0)].getName());
+//            }catch (IndexOutOfBoundsException i) {
+//                Alert alert = new Alert(Alert.AlertType.WARNING, "No file chosen");
+//                alert.showAndWait();
+//            }
         });
 
         // Upload button event
         button2.setOnAction(e -> {
             ObservableList<Integer> selectedFileName = leftListView.getSelectionModel().getSelectedIndices();
             try {
+                clientOutput.println("UPLOAD");
                 clientOutput.println(filesList[selectedFileName.get(0)].getName());
+                try {
+                    BufferedReader bufferedReader = new BufferedReader(new FileReader(filesList[selectedFileName.get(0)].getName()));
+                    String line;
+                    while((line = bufferedReader.readLine()) != null){
+                        clientOutput.println(line);
+                    }
+                }catch(IOException exception){
+                    exception.printStackTrace();
+                }
             }catch (IndexOutOfBoundsException i) {
                 Alert alert = new Alert(Alert.AlertType.WARNING, "No file chosen");
                 alert.showAndWait();
@@ -101,5 +116,15 @@ public class Client extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    public ListView<String> refreshRightPanel(ListView<String> rightListView) throws IOException {
+        int index = 0;
+        String line;
+        rightListView.getItems().clear();
+        while((line = clientInput.readLine()) != null) {
+            rightListView.getItems().add(clientInput.readLine());
+        }
+        return rightListView;
     }
 }
