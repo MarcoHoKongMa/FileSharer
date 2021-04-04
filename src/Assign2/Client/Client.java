@@ -9,10 +9,17 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-
 import java.net.*;
 import java.io.*;
 import java.util.*;
+
+/**
+ * Client Class used as the main class to execute the interface
+ * and interact with the server.
+ * @author  Ting Wu, Marco Ma
+ * @version 1.0
+ * @since   2021-03-28
+ */
 
 public class Client extends Application {
 
@@ -153,7 +160,7 @@ public class Client extends Application {
                 ObservableList<Integer> selectedFileName = leftListView.getSelectionModel().getSelectedIndices();
                 ObservableList<String> selectedItemsName = leftListView.getSelectionModel().getSelectedItems();
                 for(String items: selectedItemsName) {
-                    if(items.equals(".")) {
+                    if(items.equals("..")) {
                         directory = new File(directory.getPath() + "\\..");
                         refreshLeftPanel();
                         break;
@@ -210,11 +217,16 @@ public class Client extends Application {
         primaryStage.show();
     }
 
+    /**
+     * This function updates the listview items on the left
+     * side of the interface representing the clients
+     * local textfiles.
+     */
     private void refreshLeftPanel() {
         leftListView.getItems().clear();
         filesList = directory.listFiles();
 
-        leftListView.getItems().add(".");
+        leftListView.getItems().add("..");
         if(filesList != null) {
             for(File file: filesList) {
                 leftListView.getItems().add(file.getName());
@@ -222,6 +234,11 @@ public class Client extends Application {
         }
     }
 
+    /**
+     * This function updates the listview items on the right
+     * side of the interface representing the servers
+     * local textfiles.
+     */
     public void refreshRightPanel() throws IOException {
         clientOutput.println("DIR");
 
@@ -242,6 +259,10 @@ public class Client extends Application {
         clientOutput.close();
     }
 
+    /**
+     * This function instantiates a new socket object
+     * and create a input and output stream towards the server.
+     */
     public void reconnect(){
         try {
             socket = new Socket("127.0.0.1", 1024);                            // Connect to the server

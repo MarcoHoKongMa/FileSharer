@@ -5,7 +5,7 @@ import java.io.*;
 
 /**
  * FileServerThread used to represent a thread for a server that process requests
- * from the client such as taking command line arguments.
+ * from the client such as the download button and upload button.
  * @author  Ting Wu, Marco Ma
  * @version 1.0
  * @since   2021-03-28
@@ -54,6 +54,11 @@ public class FileServerThread extends Thread {
         }
     }
 
+    /**
+     * This function returns a string array of all the local
+     * textfile names to the client.
+     * @return String[]. String array of local text file names.
+     */
     public String[] dir() {
         File[] filesList = directory.listFiles();
         String[] fileNames = new String[1];
@@ -68,6 +73,11 @@ public class FileServerThread extends Thread {
         return fileNames;
     }
 
+    /**
+     * This method recieves a textfile name and contents from a client and
+     * creates a new textfile that is stored in the TextFiles directory.
+     * @throws IOException
+     */
     public void uploadFile() throws IOException {
         File srcFile = new File(directory.getPath() + "\\" + serverInput.readLine());
         PrintWriter writer = new PrintWriter(srcFile);
@@ -80,6 +90,12 @@ public class FileServerThread extends Thread {
         writer.close();
     }
 
+    /**
+     * This method sends a textfile name and contents to a client
+     * where they will reconstruct the file using the filename
+     * and its contents.
+     * @throws IOException
+     */
     public void downloadFile() throws IOException {
         File srcFile = new File(directory.getPath() + "\\" + serverInput.readLine());
         FileReader fileInput = new FileReader(srcFile);
