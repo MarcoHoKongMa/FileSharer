@@ -19,6 +19,9 @@ providing a directory path as a commandline argument for the textfiles the clien
 to directly choose a directory by using their local operating systems file manager.
 
 ###How-to-Run:
+The server ip address needs to be changed mnaully depending on what computer
+ther server is running on. The client sockets hostname also needs to be changed
+manually to match the servers address. The sockets are predefined and do not change.
 The server side program located in the server directory named FileServer.java
 needs to be first executed then. The client needs to execute the client side program
 located in the client directory named Client.java a popup message will appear asking
