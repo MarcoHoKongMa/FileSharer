@@ -1,6 +1,6 @@
-#File Sharer
+# File Sharer
 
-###Project Information:
+### Project Information:
 This project is a file sharer that shares textfiles between a client and server
 on the same local network. The client has the ability to interact with an interface 
 that can upload and download textfiles to and from a server. Where the left panel
@@ -10,7 +10,7 @@ on their local machine.
 
 ![](Images/interface.png)
 
-###Improvements:
+### Improvements:
 Compared to the base assignment we added a icon to the top left corner of the client interface.
 Client is now able to display the contents of a textfile stored on their local machine in the 
 left panel of the interface by double left clicking a textfile. Client is also able to navigate
@@ -18,7 +18,7 @@ through parent and sub directories on the left panel of the interface. And final
 providing a directory path as a commandline argument for the textfiles the client is now able 
 to directly choose a directory by using their local operating systems file manager.
 
-###How-to-Run:
+### How-to-Run:
 The server ip address needs to be changed mnaully depending on what computer
 ther server is running on. The client sockets hostname also needs to be changed
 manually to match the servers address. The sockets are predefined and do not change.
